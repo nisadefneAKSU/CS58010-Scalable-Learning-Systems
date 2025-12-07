@@ -75,6 +75,8 @@ class FedALAClient(BaseClient):
         Only top layers (self.layer_idx) are adapted; lower layers are preserved."""
         print("Starting adaptive local aggregation...", flush=True)
 
+        global_model = copy.deepcopy(self.task.model)
+        local_model = copy.deepcopy(self.task.model)
         # Get list of training nodes
         # train_mask is a boolean mask: true means this node is for training so extract training node indices from the mask
         try:
@@ -110,8 +112,8 @@ class FedALAClient(BaseClient):
             sub_data.batch = torch.zeros(sub_data.x.size(0), dtype=torch.long).to(self.device)
 
         # Get model parameters
-        params_g = list(copy.deepcopy(self.task.model.parameters())) # Parameters from the global (server) model
-        params_l = list(copy.deepcopy(self.task.model.parameters())) # Parameters from the local (client) model
+        params_g = list(global_model.parameters()) # Parameters from the global (server) model
+        params_l = list(local_model.parameters()) # Parameters from the local (client) model
         
 
         # Skip adaptation if this is the first round (global and local models are identical)
