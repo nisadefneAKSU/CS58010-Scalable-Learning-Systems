@@ -119,7 +119,7 @@ class FedALAClient(BaseClient):
         # let's say we have total 5 layers and layer_idx=2, then: the weight matrix consists of 3 layers. initially all ones.
         # we will learn this weight matrix in each iteration. 
 
-        layer_idx = 2
+        layer_idx = 3
 
         # Prepare top layers for adaptation
         temp_model = copy.deepcopy(local_model) # Temporary model for gradient updates
