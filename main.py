@@ -29,7 +29,7 @@ args.gala_temperature = 0.5  # τ: Softmax temperature for aggregation weights
 args.gala_warmup_rounds = 10  # Number of warm-up rounds using graph+param distances
 
 if True:  # Flag to switch between different FL algorithms
-    args.fl_algorithm = "fedala"  # G-FedALA with graph awareness
+    args.fl_algorithm = "fedala"  # Change it as FedALA or G-FedALA with graph awareness
     args.model = ["gin"]  # GNN architecture: Graph Isomorphism Network (GIN)
 else:
     args.fl_algorithm = "fedproto"  # Alternative is FedProto algorithm
@@ -52,4 +52,5 @@ def patched_torch_load(*args, **kwargs):
 torch.load = patched_torch_load  # Override torch.load globally with patched version
 
 trainer = FGLTrainer(args)  # Create trainer object above arguments
+
 trainer.train()  # Start federated training process (100 rounds)
