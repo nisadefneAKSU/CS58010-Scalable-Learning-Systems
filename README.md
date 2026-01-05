@@ -2,11 +2,11 @@
 
 After downloading OpenFGL main repository please put:
 
-fedala and gfedala folder -> Under openfgl/flcore (The folder where FedALA/GFedALA logic is implemented)
+fedala and gfedala folder -> Under openfgl/flcore (The folder where FedALA/G-FedALA logic is implemented)
 
 main.py -> Under OpenFGL-main (main folder) (The trainer we implement, test and evaluate for experiments)
 
-basic_utils.py -> Under openfgl/utils (Added FedALA and GFedALA client and server)
+basic_utils.py -> Under openfgl/utils (Added FedALA and G-FedALA client and server)
 
 config.py -> Under openfgl/flcore (Added "fedala" and "gfedala" for support purposes)
 
