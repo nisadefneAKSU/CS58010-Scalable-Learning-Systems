@@ -1,6 +1,6 @@
 # CS58010-Scalable-Learning-Systems
 
-Please put:
+After downloading OpenFGL main repository please put:
 
 fedala and gfedala folder -> Under openfgl/flcore (The folder where FedALA/GFedALA logic is implemented)
 
