@@ -61,21 +61,21 @@ parser.add_argument("--num_rounds", type=int, default=100)
 parser.add_argument("--fl_algorithm", type=str, default="fedavg", choices=supported_fl_algorithm)
 parser.add_argument("--client_frac", type=float, default=1.0)
 
-# [NEW]
+# [G-FedALA]
 parser.add_argument(
     "--lambda_graph",
     type=float,
     default=0.5,
     help="Weight controlling the contribution of model parameter similarity versus graph-embedding similarity when computing client aggregation weights"
 )
-# [NEW]
+# [G-FedALA]
 parser.add_argument(
     "--gala_temperature",
     type=float,
     default=0.05,
     help="Softmax temperature controlling how sharply client similarity scores influence aggregation weights"
 )
-# [NEW]
+# [G-FedALA]
 parser.add_argument(
     "--gala_warmup_rounds",
     type=float,
