@@ -58,6 +58,9 @@ def load_client(args, client_id, data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedala":
         from openfgl.flcore.fedala.client import FedALAClient
         return FedALAClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "gfedala":
+        from openfgl.flcore.gfedala.client import GFedALAClient
+        return GFedALAClient(args, client_id, data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedavg":
         from openfgl.flcore.fedavg.client import FedAvgClient
         return FedAvgClient(args, client_id, data, data_dir, message_pool, device)
@@ -133,6 +136,9 @@ def load_server(args, global_data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedala":
         from openfgl.flcore.fedala.server import FedALAServer
         return FedALAServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "gfedala":
+        from openfgl.flcore.gfedala.server import GFedALAServer
+        return GFedALAServer(args, global_data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedavg":
         from openfgl.flcore.fedavg.server import FedAvgServer
         return FedAvgServer(args, global_data, data_dir, message_pool, device)
