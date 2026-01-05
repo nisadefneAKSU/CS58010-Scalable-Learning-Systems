@@ -61,6 +61,28 @@ parser.add_argument("--num_rounds", type=int, default=100)
 parser.add_argument("--fl_algorithm", type=str, default="fedavg", choices=supported_fl_algorithm)
 parser.add_argument("--client_frac", type=float, default=1.0)
 
+# [NEW]
+parser.add_argument(
+    "--lambda_graph",
+    type=float,
+    default=0.5,
+    help="Weight controlling the contribution of model parameter similarity versus graph-embedding similarity when computing client aggregation weights"
+)
+# [NEW]
+parser.add_argument(
+    "--gala_temperature",
+    type=float,
+    default=0.05,
+    help="Softmax temperature controlling how sharply client similarity scores influence aggregation weights"
+)
+# [NEW]
+parser.add_argument(
+    "--gala_warmup_rounds",
+    type=float,
+    default=20,
+    help="Number of initial training rounds during which graph-structure similarity is incorporated into aggregation weight computation"
+)
+
 
 # simulation settings
 parser.add_argument("--simulation_mode", type=str, default="subgraph_fl_louvain", choices=supported_graph_fl_simulations + supported_subgraph_fl_simulations)
