@@ -1,4 +1,5 @@
-from .client import FedALAClient
-from .server import FedALAServer
+from .client import GFedALAClient
+from .server import GFedALAServer
 
-__all__ = ["FedALAClient", "FedALAServer"]
+
+__all__ = ["GFedALAClient", "GFedALAServer"]
