@@ -228,6 +228,11 @@ logit_i = -d_param(i)                              # After warm-up
 - **Backbone**: Similarity-weighted aggregation using `α_i`
 - **Head**: Sample-weighted aggregation (FedAvg-style)
 
+
+
+> ⚠️ **Current Limitation:** This implementation is hardcoded for the **GIN (Graph Isomorphism Network)** architecture. The backbone-neck-head split logic can be extended to other GNN models by modifying the layer detection functions.
+
+
 ### Hyperparameters
 
 | Parameter | Symbol | Default | Description |
@@ -242,35 +247,74 @@ logit_i = -d_param(i)                              # After warm-up
 
 ## Experiments
 
-### Supported Datasets
-
-G-FedALA supports all Graph-FL datasets in OpenFGL:
-
-| Dataset | Graphs | Avg. Nodes | Avg. Edges | Classes | Domain |
-|---------|--------|------------|------------|---------|--------|
-| MUTAG | 188 | 17.9 | 19.8 | 2 | Chemistry |
-| PROTEINS | 1,113 | 39.1 | 72.8 | 2 | Biology |
-| NCI1 | 4,110 | 29.9 | 32.3 | 2 | Chemistry |
-| PTC_MR | 344 | 14.3 | 14.7 | 2 | Chemistry |
-| IMDB-BINARY | 1,000 | 19.8 | 96.5 | 2 | Social |
-| COLLAB | 5,000 | 74.5 | 2,457.8 | 3 | Social |
-
 ### Supported GNN Models
 
-- **GIN** (Graph Isomorphism Network) - Default
-- GCN (Graph Convolutional Network)
-- GAT (Graph Attention Network)
-- GraphSAGE
-- And more...
+Currently, G-FedALA supports:
+
+- **GIN** (Graph Isomorphism Network) ✓
+
+> **Note:** The current implementation uses hardcoded layer detection for the GIN architecture (`convs`, `batch_norms` for backbone; `lin1`, `batch_norm1`, `lin2` for head). While the backbone-neck-head split strategy is conceptually applicable to other GNN architectures, extending support requires modifying the `_is_backbone()`, `_is_neck_head()`, and `_head_params()` functions to match the target model's layer naming conventions.
+
+### Extending to Other GNN Models
+
+To add support for a new GNN architecture (e.g., GCN, GAT), modify the following functions:
+
+**In `server.py`:**
+```python
+def _is_backbone(k: str) -> bool:
+    """Modify to match your model's backbone layer names."""
+    # Example for GCN:
+    # return k.startswith("conv_layers.") or k.startswith("bn_layers.")
+    return k.startswith("convs.") or k.startswith("batch_norms.")
+
+def _is_neck_head(k: str) -> bool:
+    """Modify to match your model's head layer names."""
+    # Example for GCN:
+    # return k.startswith("fc1.") or k.startswith("fc2.")
+    return k.startswith("lin1.") or k.startswith("batch_norm1.") or k.startswith("lin2.")
+```
+
+**In `client.py`:**
+```python
+@staticmethod
+def _head_params(model):
+    """Modify to return head parameters for your model."""
+    # Example for GCN:
+    # return list(model.fc1.parameters()) + list(model.fc2.parameters())
+    return (
+        list(model.lin1.parameters()) +
+        list(model.batch_norm1.parameters()) +
+        list(model.lin2.parameters())
+    )
+```
 
 ### Running Experiments
+
+#### Data Simulation
+
+G-FedALA uses the **Label Skew** simulation mode from OpenFGL to create non-IID data distribution across clients:
+
+```python
+args.scenario = "graph_fl"
+args.task = "graph_cls"
+args.simulation_mode = "graph_fl_label_skew"  # Label-based non-IID partition
+args.skew_alpha = 1.0 # a parameter not mentioned in OpenFGl/config.py but required to be passed to run the project. We predict that it should be same as the value of args.dirichlet_alpha
+args.dirichlet_alpha = 1.0  # Controls heterogeneity (lower = more heterogeneous)
+```
+
+> **Note:** The `dirichlet_alpha` parameter controls the degree of label distribution skew. Lower values create more heterogeneous (non-IID) data distributions across clients.
+
+#### Example Commands
 
 ```bash
 # PROTEINS dataset with 10 clients
 python main.py --dataset PROTEINS --num_clients 10 --fl_algorithm gfedala
 
-# NCI1 dataset with label-based partition
-python main.py --dataset NCI1 --num_clients 5 --simulation_mode graph_fl_label
+# ENZYMES dataset with label skew partition
+python main.py --dataset ENZYMES --num_clients 5 --simulation_mode graph_fl_label_skew
+
+# COLLAB dataset (social network)
+python main.py --dataset COLLAB --num_clients 10 --fl_algorithm gfedala
 
 # Ablation: Without graph similarity (λ=1.0)
 python main.py --dataset MUTAG --fl_algorithm gfedala --lambda_graph 1.0
@@ -291,25 +335,14 @@ G-FedALA/
 │   ├── client.py          # FedALAClient (baseline)
 │   └── server.py          # FedALAServer (baseline)
 ├── experiments/
-│   ├── run_gfedala.py
-│   └── configs/
+│   ├── gfedala_grid_search.py
+│   ├── get_best_params.py
+│   └── ablation.py
 ├── assets/
 │   └── gfedala_banner.png
 ├── README.md
-├── requirements.txt
-└── LICENSE
+└── requirements.txt
 ```
-
----
-
-## Comparison with Baseline Methods
-
-| Method | Client Personalization | Server Aggregation | Graph-Aware |
-|--------|----------------------|-------------------|-------------|
-| FedAvg | ✗ | Sample-weighted | ✗ |
-| FedProx | Proximal term | Sample-weighted | ✗ |
-| FedALA | ALA module | Sample-weighted | ✗ |
-| **G-FedALA** | **ALA module** | **Similarity-weighted (split)** | **✓** |
 
 ---
 
@@ -320,7 +353,7 @@ If you find this work useful, please cite:
 ```bibtex
 @misc{gfedala2024,
   title={G-FedALA: Graph-Aware Federated Adaptive Local Aggregation for Federated Graph Learning},
-  author={Your Name},
+  author={Aksu N. D., Arkac C.},
   year={2024},
   note={Built on OpenFGL framework}
 }
@@ -362,11 +395,6 @@ And the OpenFGL benchmark:
 
 ---
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 <p align="center">
   <i>Built with ❤️ for the Federated Graph Learning community</i>
+</p>
