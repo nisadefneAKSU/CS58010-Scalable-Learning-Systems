@@ -1,8 +1,8 @@
 # CS58010-Scalable-Learning-Systems
 
-After downloading OpenFGL main repository please put:
+After downloading OpenFGL main repository to your pc please put:
 
-fedala and gfedala folder -> Under openfgl/flcore (The folder where FedALA/G-FedALA logic is implemented)
+fedala and gfedala folder -> Under openfgl/flcore (These are the folders where FedALA and G-FedALA logic is implemented)
 
 main.py -> Under OpenFGL-main (main folder) (The trainer we implement, test and evaluate for experiments)
 
