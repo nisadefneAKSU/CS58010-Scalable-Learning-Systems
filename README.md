@@ -24,14 +24,14 @@
 
 ## Overview
 
-**G-FedALA** (Graph-Aware Federated Adaptive Local Aggregation) is a novel federated graph learning algorithm that extends [FedALA](https://arxiv.org/abs/2212.01197) (AAAI 2023) to the graph domain. Built on the [OpenFGL](https://github.com/xkLi-Allen/OpenFGL) framework, G-FedALA addresses the unique challenges of federated learning on graph-structured data by incorporating graph-structure similarity into the aggregation process.
+**G-FedALA** (Graph-Aware Federated Adaptive Local Aggregation) is a novel federated graph learning algorithm that extends [FedALA](https://arxiv.org/abs/2212.01197) (AAAI 2023) to the graph domain. Built on the [OpenFGL](https://github.com/xkLi-Allen/OpenFGL) framework, G-FedALA addresses the unique challenges of federated learning on graph-structured data by integrating graph-structure awareness into the server-side aggregation process.
 
 ### Key Idea
 
 In standard federated learning, statistical heterogeneity across clients degrades the performance of the global model. While FedALA addresses this through adaptive local aggregation on the client side, G-FedALA goes further by:
 
-1. **Client-Side**: Using Adaptive Local Aggregation (ALA) to learn personalized mixing weights between global and local head parameters
-2. **Server-Side**: Incorporating graph-structure similarity (via graph embeddings) into the aggregation weights, enabling structure-aware model fusion
+1. **Client-Side**: FedALA-based adaptive local aggregation using loss-driven, element-wise mixing of local and global model parameters. Clients compute graph embeddings locally and share them with the server.
+2. **Server-Side**: Structure-aware aggregation that combines parameter similarity and graph-embedding similarity to weight client contributions.
 
 ---
 
@@ -41,7 +41,7 @@ In standard federated learning, statistical heterogeneity across clients degrade
 |---------|-------------|
 | 🔷 **Graph-Aware Aggregation** | Utilizes client graph embeddings for structure-aware server aggregation |
 | 🔷 **Adaptive Local Aggregation** | Learns per-parameter mixing weights for personalized initialization |
-| 🔷 **Split Aggregation Strategy** | Backbone: similarity-weighted, Head: sample-weighted |
+| 🔷 **Split Aggregation Strategy** | Backbone: Similarity-weighted, Head: Sample-size–weighted |
 | 🔷 **Warm-up Mechanism** | Initial rounds use graph+param distances, later rounds use only param distances |
 | 🔷 **OpenFGL Compatible** | Seamlessly integrates with the OpenFGL benchmark framework |
 | 🔷 **Graph-FL Ready** | Designed for graph classification tasks in the Graph-FL scenario |
