@@ -201,6 +201,12 @@ OpenFGL-main/
 └── data/                        # Will be auto-generated
 ```
 
+Edit main.py to set your experiment configuration (you can change other arguments to your liking):
+```python
+# Select algorithm
+args.fl_algorithm = "fedala"  # or "gfedala"
+```
+
 ## Method
 
 ### Architecture Overview
@@ -294,7 +300,6 @@ logit_i = -d_param(i)                              # After warm-up
 **Split Aggregation:**
 - **Backbone**: Similarity-weighted aggregation using `α_i`
 - **Head**: Sample-weighted aggregation (FedAvg-style)
-
 
 
 > ⚠️ **Current Limitation:** This implementation is hardcoded for the **GIN (Graph Isomorphism Network)** architecture. The backbone-neck-head split logic can be extended to other GNN models by modifying the layer detection functions.
