@@ -113,11 +113,9 @@ pip install -r docs/requirements.txt
 
 ---
 
-Add FedALA and G-FedALA Files
-
-Place the following files in the OpenFGL repository structure:
-
 ### Algorithm Implementation Folders
+Place the following files in the OpenFGL repository structure to add FedALA and G-FedALA:
+
 ```
 OpenFGL/
 ├── openfgl/
