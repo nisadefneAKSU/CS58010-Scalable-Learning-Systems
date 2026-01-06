@@ -141,7 +141,7 @@ OpenFGL/
 ```
 OpenFGL/
 ├── openfgl/
-│   ├── config.py      # ← Replace this file
+│   ├── config.py               # ← Replace this file
 │   │
 │   └── utils/
 │       └── basic_utils.py      # ← Replace this file
