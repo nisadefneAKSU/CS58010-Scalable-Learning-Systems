@@ -67,72 +67,139 @@ Install from source:
 ```bash
 git clone https://github.com/xkLi-Allen/OpenFGL.git
 cd OpenFGL
+pip install -e .
 ```
 Or download the ZIP file from [OpenFGL GitHub](https://github.com/xkLi-Allen/OpenFGL) and extract it.
 
-### Install G-FedALA
+### Install Our Repository
 
 ```bash
 git clone https://github.com/nisadefneAKSU/CS58010-Scalable-Learning-Systems.git
 cd CS58010-Scalable-Learning-Systems
-
-# Copy algorithm files to OpenFGL
-cp gfedala/client.py /path/to/openfgl/flcore/gfedala/
-cp gfedala/server.py /path/to/openfgl/flcore/gfedala/
 ```
-
----
 
 ## Quick Start
 
-### Basic Usage
-
-```python
-import openfgl.config as config
-from openfgl.flcore.trainer import FGLTrainer
-
-args = config.args
-
-# Data configuration
-args.root = "your_data_root"
-args.dataset = ["PROTEINS"]  # or ["MUTAG", "NCI1", "PTC_MR", ...]
-args.num_clients = 10
-
-# G-FedALA specific hyperparameters
-args.fl_algorithm = "gfedala"
-args.model = ["gin"]  # Graph Isomorphism Network
-
-# G-FedALA hyperparameters
-args.lambda_graph = 0.5        # Balance between param and graph distances
-args.gala_temperature = 1.0    # Softmax temperature for aggregation weights
-args.gala_warmup_rounds = 5    # Rounds to use graph+param similarity
-
-# Training configuration
-args.num_rounds = 100
-args.num_epochs = 1
-args.batch_size = 32
-args.lr = 0.01
-
-# Initialize and train
-trainer = FGLTrainer(args)
-trainer.train()
-```
-
-### Command Line
+Option A: Using Conda (Recommended for Windows)
 
 ```bash
-python main.py \
-    --dataset PROTEINS \
-    --num_clients 10 \
-    --fl_algorithm gfedala \
-    --model gin \
-    --lambda_graph 0.5 \
-    --gala_temperature 1.0 \
-    --gala_warmup_rounds 5 \
-    --num_rounds 100
+# Create a new conda environment
+conda create -n openfgl_env python=3.9
+conda activate openfgl_env
+
+# Install PyTorch (adjust CUDA version as needed)
+# For CPU only:
+conda install pytorch torchvision torchaudio cpuonly -c pytorch
+
+# For GPU (CUDA 11.8 example):
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+
+# Install PyTorch Geometric
+conda install pyg -c pyg
+
+# Install other dependencies
+pip install -r docs/requirements.txt
+```
+Option B: Using pip
+
+```bash
+# Create virtual environment
+python -m venv openfgl_env
+source openfgl_env/bin/activate  # On Windows: openfgl_env\Scripts\activate
+
+# Install dependencies
+pip install -r docs/requirements.txt
 ```
 
 ---
+
+Add FedALA and G-FedALA Files
+
+Place the following files in the OpenFGL repository structure:
+
+### 3.1 Algorithm Implementation Folders
+```
+OpenFGL/
+├── openfgl/
+│   ├── flcore/
+│   │   ├── fedala/              # ← Add this folder
+│   │   │   ├── __init__.py
+│   │   │   ├── client.py
+│   │   │   └── server.py
+│   │   └── gfedala/             # ← Add this folder
+│   │       ├── __init__.py
+│   │       ├── client.py
+│   │       └── server.py
+```
+
+**What these contain:**
+- `client.py`: Client-side training logic 
+- `server.py`: Server-side aggregation logic
+- `__init__.py`: Exports client and server classes
+
+---
+
+### 3.2 Configuration Files
+```
+OpenFGL/
+├── openfgl/
+│   ├── config.py      # ← Replace this file
+│   │
+│   └── utils/
+│       └── basic_utils.py      # ← Replace this file
+```
+
+**Modified files:**
+- `config.py`: Adds `"fedala"` and `"gfedala"` to supported algorithms
+- `basic_utils.py`: Adds FedALA/G-FedALA client and server loading logic
+
+---
+
+### Main Training Script
+```
+OpenFGL/
+└── main.py                      # ← Add this file
+```
+
+**What it contains:**
+- Dataset configuration
+- Hyperparameter settings
+- Training loop initialization
+
+---
+
+### Requirements File (Optional)
+```
+OpenFGL/
+└── docs/
+    └── requirements.txt         # ← Replace if using Windows-specific setup
+```
+
+---
+
+## Verify File Structure
+
+Your directory should look like this:
+```
+OpenFGL-main/
+├── main.py                      # Your training script
+├── openfgl/
+│   ├── flcore/
+│   │   ├── config.py            # Modified
+│   │   ├── fedala/              # NEW
+│   │   │   ├── __init__.py
+│   │   │   ├── client.py
+│   │   │   └── server.py
+│   │   └── gfedala/             # NEW
+│   │       ├── __init__.py
+│   │       ├── client.py
+│   │       └── server.py
+│   └── utils/
+│       └── basic_utils.py       # Modified
+├── docs/
+│   └── requirements.txt         # Updated (optional)
+└── data/                        # Will be auto-generated
+```
 
 ## Method
 
@@ -140,45 +207,45 @@ python main.py \
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                          G-FedALA Framework                          │
+│                          G-FedALA Framework                         │
 ├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐        │
-│  │   Client 1   │     │   Client 2   │     │   Client N   │        │
-│  │              │     │              │     │              │        │
-│  │ ┌──────────┐ │     │ ┌──────────┐ │     │ ┌──────────┐ │        │
-│  │ │   ALA    │ │     │ │   ALA    │ │     │ │   ALA    │ │        │
-│  │ │ Module   │ │     │ │ Module   │ │     │ │ Module   │ │        │
-│  │ └──────────┘ │     │ └──────────┘ │     │ └──────────┘ │        │
-│  │      │       │     │      │       │     │      │       │        │
-│  │ ┌──────────┐ │     │ ┌──────────┐ │     │ ┌──────────┐ │        │
-│  │ │  Local   │ │     │ │  Local   │ │     │ │  Local   │ │        │
-│  │ │ Training │ │     │ │ Training │ │     │ │ Training │ │        │
-│  │ └──────────┘ │     │ └──────────┘ │     │ └──────────┘ │        │
-│  │      │       │     │      │       │     │      │       │        │
-│  │ ┌──────────┐ │     │ ┌──────────┐ │     │ ┌──────────┐ │        │
-│  │ │  Graph   │ │     │ │  Graph   │ │     │ │  Graph   │ │        │
-│  │ │Embedding │ │     │ │Embedding │ │     │ │Embedding │ │        │
-│  │ └──────────┘ │     │ └──────────┘ │     │ └──────────┘ │        │
-│  └──────┬───────┘     └──────┬───────┘     └──────┬───────┘        │
+│                                                                     │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐         │
+│  │   Client 1   │     │   Client 2   │     │   Client N   │         │
+│  │              │     │              │     │              │         │
+│  │ ┌──────────┐ │     │ ┌──────────┐ │     │ ┌──────────┐ │         │
+│  │ │   ALA    │ │     │ │   ALA    │ │     │ │   ALA    │ │         │
+│  │ │ Module   │ │     │ │ Module   │ │     │ │ Module   │ │         │
+│  │ └──────────┘ │     │ └──────────┘ │     │ └──────────┘ │         │
+│  │      │       │     │      │       │     │      │       │         │
+│  │ ┌──────────┐ │     │ ┌──────────┐ │     │ ┌──────────┐ │         │
+│  │ │  Local   │ │     │ │  Local   │ │     │ │  Local   │ │         │
+│  │ │ Training │ │     │ │ Training │ │     │ │ Training │ │         │
+│  │ └──────────┘ │     │ └──────────┘ │     │ └──────────┘ │         │
+│  │      │       │     │      │       │     │      │       │         │
+│  │ ┌──────────┐ │     │ ┌──────────┐ │     │ ┌──────────┐ │         │
+│  │ │  Graph   │ │     │ │  Graph   │ │     │ │  Graph   │ │         │
+│  │ │Embedding │ │     │ │Embedding │ │     │ │Embedding │ │         │
+│  │ └──────────┘ │     │ └──────────┘ │     │ └──────────┘ │         │
+│  └──────┬───────┘     └──────┬───────┘     └──────┬───────┘         │
 │         │                    │                    │                 │
 │         └────────────────────┼────────────────────┘                 │
 │                              ▼                                      │
-│                    ┌──────────────────┐                            │
-│                    │      Server      │                            │
-│                    │                  │                            │
-│                    │ ┌──────────────┐ │                            │
-│                    │ │  Compute     │ │                            │
-│                    │ │  Distances   │ │                            │
-│                    │ │ (Param+Graph)│ │                            │
-│                    │ └──────────────┘ │                            │
-│                    │        │         │                            │
-│                    │ ┌──────────────┐ │                            │
-│                    │ │   Split      │ │                            │
-│                    │ │ Aggregation  │ │                            │
-│                    │ └──────────────┘ │                            │
-│                    └──────────────────┘                            │
-│                                                                      │
+│                    ┌──────────────────┐                             │
+│                    │      Server      │                             │
+│                    │                  │                             │
+│                    │ ┌──────────────┐ │                             │
+│                    │ │  Compute     │ │                             │
+│                    │ │  Distances   │ │                             │
+│                    │ │ (Param+Graph)│ │                             │
+│                    │ └──────────────┘ │                             │
+│                    │        │         │                             │
+│                    │ ┌──────────────┐ │                             │
+│                    │ │   Split      │ │                             │
+│                    │ │ Aggregation  │ │                             │ 
+│                    │ └──────────────┘ │                             │
+│                    └──────────────────┘                             │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
