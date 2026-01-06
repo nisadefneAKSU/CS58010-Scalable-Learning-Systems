@@ -117,7 +117,7 @@ Add FedALA and G-FedALA Files
 
 Place the following files in the OpenFGL repository structure:
 
-### 3.1 Algorithm Implementation Folders
+### Algorithm Implementation Folders
 ```
 OpenFGL/
 ├── openfgl/
@@ -139,7 +139,7 @@ OpenFGL/
 
 ---
 
-### 3.2 Configuration Files
+### Configuration Files
 ```
 OpenFGL/
 ├── openfgl/
@@ -255,10 +255,9 @@ args.fl_algorithm = "fedala"  # or "gfedala"
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Client-Side: Adaptive Local Aggregation (ALA)
+### Client-Side
 
 The ALA module learns element-wise mixing weights `w ∈ [0,1]` for head parameters:
-
 ```
 θ_head = θ_local + (θ_global - θ_local) ⊙ w
 ```
@@ -271,25 +270,27 @@ The ALA module learns element-wise mixing weights `w ∈ [0,1]` for head paramet
 
 **Three-Phase Strategy:**
 - **Round 0**: Skip ALA (global = local)
-- **Round 1**: Learn weights until convergence (up to 20 epochs)
+- **Round 1**: Learn weights with multiple epochs in the initial round
 - **Round 2+**: Single epoch refinement
 
-### Server-Side: Graph-Aware Aggregation
+**Graph-Level Embedding Computation:**
+- After local training completes, each client computes a graph-level embedding representing its local data distribution
+
+### Server-Side
 
 **Distance Computation:**
 
-1. **Parameter Distance** (using head parameters):
+1. **Parameter Distance** (Using head parameters):
 ```
 d_param(i) = √(mean_k[(||θ_i^k - θ_g^k|| / ||θ_g^k||)²])
 ```
 
-2. **Graph Distance** (during warm-up):
+2. **Graph Distance** (During warm-up):
 ```
 d_graph(i) = ||h_i - h_global|| / ||h_global||
 ```
 
 **Aggregation Weight Calculation:**
-
 ```
 logit_i = -[λ · d_param(i) + (1-λ) · d_graph(i)]  # During warm-up
 logit_i = -d_param(i)                              # After warm-up
@@ -301,9 +302,7 @@ logit_i = -d_param(i)                              # After warm-up
 - **Backbone**: Similarity-weighted aggregation using `α_i`
 - **Head**: Sample-weighted aggregation (FedAvg-style)
 
-
 > ⚠️ **Current Limitation:** This implementation is hardcoded for the **GIN (Graph Isomorphism Network)** architecture. The backbone-neck-head split logic can be extended to other GNN models by modifying the layer detection functions.
-
 
 ### Hyperparameters
 
