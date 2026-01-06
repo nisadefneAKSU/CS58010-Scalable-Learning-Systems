@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="assets/gfedala_banner.png" alt="G-FedALA Logo" width="800"/>
-</p>
-
 <h1 align="center">G-FedALA: Graph-Aware Federated Adaptive Local Aggregation</h1>
 
 <p align="center">
