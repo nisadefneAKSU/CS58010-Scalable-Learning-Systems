@@ -56,27 +56,25 @@ In standard federated learning, statistical heterogeneity across clients degrade
 # Python 3.8+
 # PyTorch 2.0+
 # PyTorch Geometric
+# Anaconda
+# Git
 ```
 
 ### Install OpenFGL
 
-```bash
-pip install openfgl-lib
-```
-
-Or install from source:
+Install from source:
 
 ```bash
 git clone https://github.com/xkLi-Allen/OpenFGL.git
 cd OpenFGL
-pip install -e .
 ```
+Or download the ZIP file from [OpenFGL GitHub](https://github.com/xkLi-Allen/OpenFGL) and extract it.
 
 ### Install G-FedALA
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/G-FedALA.git
-cd G-FedALA
+git clone https://github.com/nisadefneAKSU/CS58010-Scalable-Learning-Systems.git
+cd CS58010-Scalable-Learning-Systems
 
 # Copy algorithm files to OpenFGL
 cp gfedala/client.py /path/to/openfgl/flcore/gfedala/
